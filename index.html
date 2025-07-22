@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Keygenie</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Arial', sans-serif;
+    }
+
+    body {
+      background: #0a0a0a;
+      color: #e0e0e0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .container {
+      background: rgba(20, 20, 20, 0.95);
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+      color: #00ffff;
+      text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    }
+
+    .input-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+      color: #b0b0b0;
+    }
+
+    input[type="range"],
+    input[type="number"] {
+      width: 100%;
+      background: #1a1a1a;
+      border: none;
+      padding: 0.5rem;
+      border-radius: 5px;
+      color: #00ffff;
+      font-size: 1rem;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      height: 5px;
+      background: linear-gradient(90deg, #00ffff 0%, #1a1a1a 100%);
+      border-radius: 5px;
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 15px;
+      height: 15px;
+      background: #00ffff;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    }
+
+    input[type="checkbox"] {
+      accent-color: #00ffff;
+      margin-right: 0.5rem;
+    }
+
+    .checkbox-group {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 1.5rem;
+    }
+
+    button {
+      background: #00ffff;
+      color: #0a0a0a;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    }
+
+    button:hover {
+      background: #00cccc;
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
+      transform: translateY(-2px);
+    }
+
+    #passwordOutput {
+      background: #1a1a1a;
+      padding: 1rem;
+      border-radius: 5px;
+      font-size: 1.2rem;
+      word-break: break-all;
+      margin-bottom: 1rem;
+      color: #00ffff;
+      min-height: 3rem;
+    }
+
+    .copy-btn {
+      background: #1a1a1a;
+      color: #00ffff;
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+    }
+
+    .copy-btn:hover {
+      background: #00cccc;
+      color: #0a0a0a;
+    }
+
+    @keyframes glow {
+      0% { box-shadow: 0 0 10px rgba(0, 255, 255, 0.5); }
+      50% { box-shadow: 0 0 20px rgba(0, 255, 255, 0.8); }
+      100% { box-shadow: 0 0 10px rgba(0, 255, 255, 0.5); }
+    }
+
+    .container:hover {
+      animation: glow 1.5s infinite;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Password Generator</h1>
+    <div class="input-group">
+      <label for="length">Password Length: <span id="lengthValue">12</span></label>
+      <input type="range" id="length" min="4" max="32" value="12">
+    </div>
+    <div class="checkbox-group">
+      <label><input type="checkbox" id="uppercase" checked> Uppercase</label>
+      <label><input type="checkbox" id="lowercase" checked> Lowercase</label>
+      <label><input type="checkbox" id="numbers" checked> Numbers</label>
+      <label><input type="checkbox" id="symbols" checked> Symbols</label>
+    </div>
+    <button onclick="generatePassword()">Generate Password</button>
+    <div id="passwordOutput"></div>
+    <button class="copy-btn" onclick="copyPassword()">Copy to Clipboard</button>
+  </div>
+
+  <script>
+    const lengthSlider = document.getElementById('length');
+    const lengthValue = document.getElementById('lengthValue');
+    const passwordOutput = document.getElementById('passwordOutput');
+    const uppercaseCheckbox = document.getElementById('uppercase');
+    const lowercaseCheckbox = document.getElementById('lowercase');
+    const numbersCheckbox = document.getElementById('numbers');
+    const symbolsCheckbox = document.getElementById('symbols');
+
+    lengthSlider.addEventListener('input', () => {
+      lengthValue.textContent = lengthSlider.value;
+    });
+
+    function generatePassword() {
+      const length = parseInt(lengthSlider.value);
+      const includeUppercase = uppercaseCheckbox.checked;
+      const includeLowercase = lowercaseCheckbox.checked;
+      const includeNumbers = numbersCheckbox.checked;
+      const includeSymbols = symbolsCheckbox.checked;
+
+      const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+      const numbers = '0123456789';
+      const symbols = '!@#$%^&*()_+-=[]{}|;:,.<>?';
+
+      let characters = '';
+      if (includeUppercase) characters += uppercase;
+      if (includeLowercase) characters += lowercase;
+      if (includeNumbers) characters += numbers;
+      if (includeSymbols) characters += symbols;
+
+      if (characters === '') {
+        passwordOutput.textContent = 'Select at least one character type';
+        return;
+      }
+
+      let password = '';
+      for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        password += characters[randomIndex];
+      }
+
+      passwordOutput.textContent = password;
+    }
+
+    function copyPassword() {
+      const password = passwordOutput.textContent;
+      if (password && password !== 'Select at least one character type') {
+        navigator.clipboard.writeText(password).then(() => {
+          alert('Password copied to clipboard!');
+        });
+      }
+    }
+  </script>
+</body>
+</html>
